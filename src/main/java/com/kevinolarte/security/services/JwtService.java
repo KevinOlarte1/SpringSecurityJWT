@@ -44,7 +44,7 @@ public class JwtService {
         return this.jwtExpiration;
     }
 
-    private String buildTokein(
+    private String buildToken(
             Map<String, Object> extraClaims,
             UserDetails userDetails,
             long expirationTime) {
@@ -55,7 +55,7 @@ public class JwtService {
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .signWith(getSignToken(), SignatureAlgorithm.HS256)
+                .signWith(getSingKey(), SignatureAlgorithm.HS256)
                 .compact();
 
     }
