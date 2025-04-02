@@ -10,26 +10,26 @@ import com.kevinolarte.security.services.JwtService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 @RequestMapping("/auth")
+@RestController
 @AllArgsConstructor
 public class AuthenticationController {
     private final JwtService jwtService;
     private final AuthenticationService authenticationService;
 
 
-    @PostMapping("/singup")
+    @PostMapping("/signup")
     public ResponseEntity<User> register(@RequestBody RegisterUserDto registerUserDto){
+        System.out.println("1111111111111111111111111111111111111111");
         User user = authenticationService.singUp(registerUserDto);
         return ResponseEntity.ok(user);
     }
 
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDto loginUserDto){
+
         User userauthentication = authenticationService.authenticate(loginUserDto);
         String token = jwtService.generateToken(userauthentication);
         LoginResponse loginResponse = new LoginResponse(

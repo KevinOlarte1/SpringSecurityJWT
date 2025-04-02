@@ -1,9 +1,7 @@
 package com.kevinolarte.security.config;
 
 
-import com.kevinolarte.security.models.User;
 import com.kevinolarte.security.repositories.UserRepository;
-import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -15,16 +13,18 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Configuration
-@AllArgsConstructor
 public class AplicationConfiguration {
 
     private final UserRepository userRepository;
 
+    public AplicationConfiguration(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Bean
     UserDetailsService userDetailsService() {
         return username -> userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User " + username + " not found"));
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
     }
 
     @Bean

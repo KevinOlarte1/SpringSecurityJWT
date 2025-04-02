@@ -27,6 +27,7 @@ public class AuthenticationService {
     private final EmailService emailService;
 
     public User singUp(RegisterUserDto input){
+
         User user = new User(input.getUsername(), input.getEmail(), passwordEncoder.encode(input.getPassword()));
         user.setVerificationCode(generateVerificationCode());
         user.setVerificationExpiration(LocalDateTime.now().plusMinutes(15));
@@ -59,10 +60,11 @@ public class AuthenticationService {
         if(optionalUser.isPresent()){
             User user = optionalUser.get();
 
-            if(!user.getVerificationExpiration().isBefore(LocalDateTime.now())){
+
+            if(user.getVerificationExpiration().isBefore(LocalDateTime.now())){
                 throw new RuntimeException("User with email " + input.getEmail() + " is expired");
             }
-            if (!user.getVerificationCode().equals(input.getVerificationCode())){
+            if (user.getVerificationCode().equals(input.getVerificationCode())){
                 user.setEnable(true);
                 user.setVerificationCode(null);
                 user.setVerificationExpiration(null);
@@ -86,7 +88,6 @@ public class AuthenticationService {
             }
             user.setVerificationCode(generateVerificationCode());
             user.setVerificationExpiration(LocalDateTime.now().plusHours(1));
-            user.setEnable(false);
             sendVerificationEmail(user);
             userRepository.save(user);
         }

@@ -16,13 +16,16 @@ public class EmailService {
 
     public void sendVerificationEmail(String to, String subject, String text)
             throws MessagingException {
+        System.out.println("3123123123123123");
         MimeMessage message = mailSender.createMimeMessage();
+        System.out.println("3123123123123123");
+
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
         helper.setTo(to);
         helper.setSubject(subject);
         helper.setText(text, true);
-
+        System.out.println("Sending verification email");
         mailSender.send(message);
     }
 }

@@ -18,18 +18,27 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import javax.sound.midi.Soundbank;
 import java.io.IOException;
 import java.security.Security;
 
 @Component
-@AllArgsConstructor
+
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final HandlerExceptionResolver handlerExceptionResolver;
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-    private final HttpServletResponse httpServletResponse;
+
+    public JwtAuthenticationFilter(
+            HandlerExceptionResolver handlerExceptionResolver,
+            JwtService jwtService,
+            UserDetailsService userDetailsService) {
+        this.handlerExceptionResolver = handlerExceptionResolver;
+        this.jwtService = jwtService;
+        this.userDetailsService = userDetailsService;
+    }
 
     @Override
     protected void doFilterInternal(
@@ -38,18 +47,29 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain) throws ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
 
-        if(authHeader == null || !authHeader.startsWith("Bearer ")) {
+        System.out.println("Me han llamado");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            System.out.println("No tiene una token");
             filterChain.doFilter(request, response);
             return;
         }
+        System.out.println("Tiene una token");
         try{
             final String jwt = authHeader.substring(7);
             final String userEmail = jwtService.extractUsername(jwt);
+            System.out.println(userEmail + " aaaaaaaaaaaaaaaaaaaaaaaaaaaa");
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
+            System.out.println(authentication + " bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
             if (userEmail != null && authentication == null){
-                UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+                System.out.println("ccccccccccccccc");
+                UserDetails userDetails = null;
+                try {
+                    userDetails = this.userDetailsService.loadUserByUsername(userEmail);
+                }catch (Exception e){
+                    System.out.println("Mierda");
+                }
 
                 if (jwtService.isTokenValid(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
