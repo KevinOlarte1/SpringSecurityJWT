@@ -1,5 +1,6 @@
 package com.kevinolarte.security.services;
 
+import com.kevinolarte.security.models.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -33,10 +34,14 @@ public class JwtService {
     }
 
     public String generateToken(UserDetails userDetails) {
+
         return generateToken(new HashMap<>(), userDetails);
     }
 
     public String generateToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+        if (userDetails instanceof User user) {
+            extraClaims.put("email", user.getEmail());
+        }
         return buildToken(extraClaims, userDetails, jwtExpiration);
     }
 
@@ -58,6 +63,10 @@ public class JwtService {
                 .signWith(getSingKey(), SignatureAlgorithm.HS256)
                 .compact();
 
+    }
+
+    public String extrtractEmail(String token) {
+        return extractAllClaims(token).get("email", String.class);
     }
 
     public boolean isTokenValid(String token, UserDetails userDetails) {

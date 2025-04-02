@@ -1,6 +1,8 @@
 package com.kevinolarte.security.config;
 
+import com.kevinolarte.security.models.User;
 import com.kevinolarte.security.services.JwtService;
+import com.kevinolarte.security.services.UserService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
@@ -38,6 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         this.handlerExceptionResolver = handlerExceptionResolver;
         this.jwtService = jwtService;
         this.userDetailsService = userDetailsService;
+
     }
 
     @Override
@@ -56,21 +60,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         System.out.println("Tiene una token");
         try{
             final String jwt = authHeader.substring(7);
-            final String userEmail = jwtService.extractUsername(jwt);
-            System.out.println(userEmail + " aaaaaaaaaaaaaaaaaaaaaaaaaaaa");
+            final String userEmail = jwtService.extrtractEmail(jwt);
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-            System.out.println(authentication + " bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb");
             if (userEmail != null && authentication == null){
-                System.out.println("ccccccccccccccc");
-                UserDetails userDetails = null;
-                try {
-                    userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-                }catch (Exception e){
-                    System.out.println("Mierda");
-                }
 
+                UserDetails userDetails =this.userDetailsService.loadUserByUsername(userEmail);
+                System.out.println(((User)userDetails).toString());
                 if (jwtService.isTokenValid(jwt, userDetails)) {
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
                             userDetails,
